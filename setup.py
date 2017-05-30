@@ -14,11 +14,11 @@ def read(fname):
 
 
 setup(
-    name="nfv-manager",
-    version="0.1.4",
+    name="physical-device-manager",
+    version="0.0.1",
     author="SoftFIRE",
     author_email="softfire@softfire.eu",
-    description="The SoftFIRE NFV Manager",
+    description="The SoftFIRE Physical Device Manager",
     license="Apache 2",
     keywords="python vnfm nfvo open baton openbaton sdk experiment manager softfire tosca openstack rest",
     url="http://softfire.eu/",
