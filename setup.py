@@ -10,7 +10,7 @@ def read(fname):
         readme_file = open(readme_file_path)
         return readme_file.read()
     else:
-        return "The SoftFIRE NFV Manager"
+        return "The SoftFIRE Physical Device Manager"
 
 
 setup(
@@ -23,7 +23,7 @@ setup(
     keywords="python vnfm nfvo open baton openbaton sdk experiment manager softfire tosca openstack rest",
     url="http://softfire.eu/",
     packages=find_packages(),
-    scripts=["nfv-manager"],
+    scripts=["physical-device-manager"],
     install_requires=[
         'softfire-sdk'
     ],

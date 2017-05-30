@@ -1,4 +1,5 @@
 import configparser
+import json
 import logging
 import logging.config
 import os
@@ -34,3 +35,8 @@ def get_config(section, key, default=None):
         return config.get(section=section, option=key)
     except configparser.NoOptionError:
         return default
+
+
+def get_available_physical_resources():
+    with open(get_config('system', 'available-physical-resources-file'), 'r') as f:
+        return json.loads(f.read())
