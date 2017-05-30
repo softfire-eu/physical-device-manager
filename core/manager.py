@@ -1,7 +1,10 @@
+import json
+
+import yaml
 from sdk.softfire.grpc import messages_pb2
 from sdk.softfire.manager import AbstractManager
 
-from utils.utils import get_available_physical_resources
+from utils.utils import get_available_physical_resources, get_logger
 
 TESTBED_MAPPING = {
     'fokus': messages_pb2.FOKUS,
@@ -17,12 +20,15 @@ TESTBED_MAPPING = {
     'any': messages_pb2.ANY
 }
 
+logger = get_logger(__name__)
+
 
 class PDManager(AbstractManager):
     def refresh_resources(self, user_info) -> list:
         pass
 
     def validate_resources(self, user_info=None, payload=None) -> None:
+        logger.info("Nothing to validate here")
         pass
 
     def release_resources(self, user_info, payload=None) -> None:
@@ -32,6 +38,7 @@ class PDManager(AbstractManager):
         pass
 
     def list_resources(self, user_info=None, payload=None) -> list:
+        logger.info("Received List Resources")
         result = []
 
         for k, v in get_available_physical_resources().items():
@@ -45,8 +52,18 @@ class PDManager(AbstractManager):
                                                         cardinality=cardinality,
                                                         node_type=node_type,
                                                         testbed=TESTBED_MAPPING.get(testbed)))
-
+        logger.info("returning %d resources" % len(result))
         return result
 
     def provide_resources(self, user_info, payload=None) -> list:
-        pass
+        result = []
+        res_dict = yaml.load(payload)
+        resource_id = res_dict.get("properties").get("resources_id")
+        if resource_id == "fokus-cell":
+            result.append(json.dumps(
+                {
+                    "resource_id": resource_id,
+                    "value": "please go to fraunhofer fokus in order to be able to use this resource"
+                }
+            ))
+        return result
