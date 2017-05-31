@@ -3,24 +3,16 @@ import json
 import yaml
 from sdk.softfire.grpc import messages_pb2
 from sdk.softfire.manager import AbstractManager
+from sdk.softfire.utils import TESTBED_MAPPING
 
 from utils.utils import get_available_physical_resources, get_logger
 
-TESTBED_MAPPING = {
-    'fokus': messages_pb2.FOKUS,
-    'fokus-dev': messages_pb2.FOKUS_DEV,
-    'ericsson': messages_pb2.ERICSSON,
-    'ericsson-dev': messages_pb2.ERICSSON_DEV,
-    'surrey': messages_pb2.SURREY,
-    'surrey-dev': messages_pb2.SURREY_DEV,
-    'ads': messages_pb2.ADS,
-    'ads-dev': messages_pb2.ADS_DEV,
-    'dt': messages_pb2.DT,
-    'dt-dev': messages_pb2.DT_DEV,
-    'any': messages_pb2.ANY
-}
-
 logger = get_logger(__name__)
+
+
+class PhysicalResourceException(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 class PDManager(AbstractManager):
@@ -28,13 +20,19 @@ class PDManager(AbstractManager):
         pass
 
     def validate_resources(self, user_info=None, payload=None) -> None:
-        logger.info("Nothing to validate here")
+        request_dict = yaml.load(payload)
+        logger.info("Validating %s " % request_dict)
+
+        resource_id = request_dict.get("properties").get('resource_id')
+        if resource_id not in get_available_physical_resources().keys():
+            raise PhysicalResourceException(
+                "Resource id %s not in the valid options: %s" % (resource_id, VALID_RESOURCE_ID))
         pass
 
     def release_resources(self, user_info, payload=None) -> None:
         pass
 
-    def create_user(self, username, password):
+    def create_user(self, user_info):
         pass
 
     def list_resources(self, user_info=None, payload=None) -> list:
@@ -62,7 +60,6 @@ class PDManager(AbstractManager):
         if resource_id == "fokus-cell":
             result.append(json.dumps(
                 {
-                    "resource_id": resource_id,
                     "value": "please go to fraunhofer fokus in order to be able to use this resource"
                 }
             ))
