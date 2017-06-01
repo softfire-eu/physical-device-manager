@@ -1,7 +1,7 @@
 
 from sdk.softfire.main import start_manager
 
-from core.manager import PDManager
+from eu.softfire.pd.core.manager import PDManager
 
 
 def start():

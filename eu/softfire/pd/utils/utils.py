@@ -4,7 +4,7 @@ import logging
 import logging.config
 import os
 
-from utils.static_config import CONFIG_FILE_PATH
+from eu.softfire.pd.utils.static_config import CONFIG_FILE_PATH
 
 
 def get_logger(name):

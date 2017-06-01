@@ -5,7 +5,7 @@ from sdk.softfire.grpc import messages_pb2
 from sdk.softfire.manager import AbstractManager
 from sdk.softfire.utils import TESTBED_MAPPING
 
-from utils.utils import get_available_physical_resources, get_logger
+from eu.softfire.pd.utils.utils import get_available_physical_resources, get_logger
 
 logger = get_logger(__name__)
 
