@@ -1,7 +1,7 @@
 
 from sdk.softfire.main import start_manager
 
-from eu.softfire.pd.core.manager import PDManager
+from eu.softfire.pd.core.PDManager import PDManager
 from eu.softfire.pd.utils.utils import get_logger
 
 
