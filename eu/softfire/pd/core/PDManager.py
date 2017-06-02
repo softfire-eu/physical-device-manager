@@ -55,7 +55,7 @@ class PDManager(AbstractManager):
 
     def provide_resources(self, user_info, payload=None) -> list:
         result = []
-        res_dict = yaml.load(payload)
+        res_dict = json.loads(payload)
         resource_id = res_dict.get("properties").get("resources_id")
         if resource_id == "fokus-cell":
             result.append(json.dumps(
