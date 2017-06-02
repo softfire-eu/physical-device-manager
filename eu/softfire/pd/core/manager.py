@@ -26,7 +26,7 @@ class PDManager(AbstractManager):
         resource_id = request_dict.get("properties").get('resource_id')
         if resource_id not in get_available_physical_resources().keys():
             raise PhysicalResourceException(
-                "Resource id %s not in the valid options: %s" % (resource_id, VALID_RESOURCE_ID))
+                "Resource id %s not in the valid options: %s" % (resource_id, get_available_physical_resources().keys()))
         pass
 
     def release_resources(self, user_info, payload=None) -> None:
