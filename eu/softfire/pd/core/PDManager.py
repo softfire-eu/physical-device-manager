@@ -45,22 +45,22 @@ class PDManager(AbstractManager):
             cardinality = int(v.get('cardinality'))
             description = v.get('description')
             resource_id = k
+            testbed_id = TESTBED_MAPPING.get(testbed)
             result.append(messages_pb2.ResourceMetadata(resource_id=resource_id,
                                                         description=description,
                                                         cardinality=cardinality,
                                                         node_type=node_type,
-                                                        testbed=TESTBED_MAPPING.get(testbed)))
+                                                        testbed=testbed_id))
         logger.info("returning %d resources" % len(result))
         return result
 
     def provide_resources(self, user_info, payload=None) -> list:
         result = []
         res_dict = json.loads(payload)
-        resource_id = res_dict.get("properties").get("resources_id")
-        if resource_id == "fokus-cell":
-            result.append(json.dumps(
-                {
-                    "value": "please go to fraunhofer fokus in order to be able to use this resource"
-                }
-            ))
+        resource_id = res_dict.get("properties").get("resource_id")
+        result.append(json.dumps(
+            {
+                "value": get_available_physical_resources().get(resource_id).get('value')
+            }
+        ))
         return result
