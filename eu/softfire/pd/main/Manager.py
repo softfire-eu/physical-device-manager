@@ -1,3 +1,4 @@
+import traceback
 
 from sdk.softfire.main import start_manager
 
@@ -35,8 +36,8 @@ def start():
     try:
         start_manager(pd_manager)
     except:
+        traceback.print_exc()
         get_logger(__name__).error("Error while shutting down...")
-        exit(0)
 
 
 if __name__ == '__main__':
