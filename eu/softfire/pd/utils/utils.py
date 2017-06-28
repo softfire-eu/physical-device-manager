@@ -8,7 +8,7 @@ from eu.softfire.pd.utils.static_config import CONFIG_FILE_PATH
 
 
 def get_logger(name):
-    logging.config.fileConfig(CONFIG_FILE_PATH)
+    logging.config.fileConfig(CONFIG_FILE_PATH, disable_existing_loggers=False)
     return logging.getLogger("eu.softfire.pd.manager.%s" % name)
 
 

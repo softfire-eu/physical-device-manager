@@ -25,7 +25,8 @@ setup(
     packages=find_packages(),
     scripts=["physical-device-manager"],
     install_requires=[
-        'softfire-sdk'
+        'softfire-sdk',
+        'PyYAML'
     ],
     long_description=read('README.rst'),
     classifiers=[
