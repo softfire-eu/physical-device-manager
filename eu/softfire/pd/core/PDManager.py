@@ -58,6 +58,7 @@ class PDManager(AbstractManager):
         result = []
         res_dict = json.loads(payload)
         resource_id = res_dict.get("properties").get("resource_id")
+        logger.info("Providing resource id: %s" % resource_id)
         result.append(json.dumps(
             {
                 "value": get_available_physical_resources().get(resource_id).get('value')
