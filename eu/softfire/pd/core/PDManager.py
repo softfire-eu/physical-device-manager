@@ -41,6 +41,12 @@ class PDManager(AbstractManager):
         if resource_id not in get_available_physical_resources().keys():
             raise PhysicalResourceException(
                 "Resource id '%s' not in the valid options: %s" % (resource_id, get_available_physical_resources().keys()))
+        try:
+            resource_name = request_dict.get("properties").get('resource_name')
+        except ValueError as e:
+            raise PhysicalResourceException(
+                "Resource name not specified."
+            )
         pass
 
     def release_resources(self, user_info, payload=None) -> None:
@@ -60,6 +66,7 @@ class PDManager(AbstractManager):
             
         if res_dict:
             resource_id = res_dict.get("properties").get("resource_id")
+            resource_name = res_dict.get("properties").get("resource_name")
             logger.debug("resource id: %s" % resource_id)
             resource_data = None
             testbed = None
@@ -67,14 +74,14 @@ class PDManager(AbstractManager):
                 if v.get('resource_id') == resource_id:
                     resource_data = v
                     testbed = k
-            if testbed is None or resource_id is None:
+            if testbed is None or resource_id is None or resource_name is None:
                 logger.warn("Resource not found, probaly never deployed. I will return.")
                 return
             targeturl = urllib.parse.urljoin(resource_data.get("url"), "ues/terminate")
             logger.info("Connecting to UE reservation engine: %s" % targeturl)
             r = requests.delete(targeturl, headers={"Authorization": "Bearer " + resource_data.get("secret"),
                                                     "Content-Type" : "application/json"},
-                                           json={"username": user_name, "resourceId": resource_id})
+                                           json={"username": user_name, "resourceId": resource_name})
             logger.debug("response from UE reservation engine: %s" % r)
 
         if r.status_code == 500:
@@ -130,6 +137,7 @@ class PDManager(AbstractManager):
         user_name = user_info.name
         res_dict = json.loads(payload)
         resource_id = res_dict.get("properties").get("resource_id")
+        resource_name = res_dict.get("properties").get("resource_name")
         logger.info("Call to reserve UE for user %s" % user_name)
         resource_data = None
         testbed = None
@@ -145,7 +153,7 @@ class PDManager(AbstractManager):
 
         targeturl = urllib.parse.urljoin(resource_data.get("url"), "ue/reserve")
         logger.info("Connecting to UE reservation engine: %s" % targeturl)
-        r = requests.post(targeturl, json={"username": user_name, "resourceId": resource_id}, 
+        r = requests.post(targeturl, json={"username": user_name, "resourceId": resource_name}, 
                                      headers={"Authorization": "Bearer " + resource_data.get("secret"),
                                               "Content-Type": "application/json"})
         logger.debug("response from UE reservation engine: %s" % r)
@@ -158,7 +166,7 @@ class PDManager(AbstractManager):
             url = response.get("url")
             email = response.get("email")
             password = response.get("password")
-            assigned_devices = response.get("assigned_devices")
+            ue_name = response.get("ue_name")  
         except ValueError as e:
             logger.error("Error reading response json from UE reservation engine: %s" % e)
             raise PhysicalResourceException("Cannot reserve UE resource")
@@ -168,10 +176,11 @@ class PDManager(AbstractManager):
                 "type": "PhysicalResource",
                 "properties": {
                     "resource_id": resource_id,
+                    "resource_name": resource_name,
                     "URL": url,
                     "login": email,
                     "password": password,
-                    "assigned_devices": assigned_devices
+                    "ue_name": ue_name
                 } 
             }
         ))
