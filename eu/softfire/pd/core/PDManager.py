@@ -77,7 +77,7 @@ class PDManager(AbstractManager):
             if testbed is None or resource_id is None or resource_name is None:
                 logger.warn("Resource not found, probaly never deployed. I will return.")
                 return
-            targeturl = urllib.parse.urljoin(resource_data.get("url"), "ues/terminate")
+            targeturl = urllib.parse.urljoin(resource_data.get("url"), "ue/terminate")
             logger.info("Connecting to UE reservation engine: %s" % targeturl)
             r = requests.delete(targeturl, headers={"Authorization": "Bearer " + resource_data.get("secret"),
                                                     "Content-Type" : "application/json"},
