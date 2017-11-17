@@ -47,7 +47,30 @@ class PDManager(AbstractManager):
             raise PhysicalResourceException(
                 "Resource name not specified."
             )
-        pass
+            
+        if resource_id == 'surrey-ue':
+            # Check reachability of UE reservation engine
+            targeturl = urllib.parse.urljoin(resource_data.get("url"), "test")
+            logger.info("Connecting to UE reservation engine: %s" % targeturl)
+            r = requests.get(targeturl)
+            logger.debug("response from UE reservation engine: %s" % r)
+
+            if r.status_code == 500:
+                raise PhysicalResourceException("Cannot reach UE reservation engine. Message: %s" % r.content)
+                
+            status = 'down'                
+            try:
+                response = r.json()
+                status = response.get("status")
+            except ValueError as e:
+                logger.error("Error connecting to UE reservation engine: %s" % e)
+                raise PhysicalResourceException("Cannot reach UE reservation engine.")
+                
+            if status == 'up':
+                pass        
+        
+        else:
+            pass
 
     def release_resources(self, user_info, payload=None) -> None:
         """
@@ -85,7 +108,7 @@ class PDManager(AbstractManager):
             logger.debug("response from UE reservation engine: %s" % r)
 
         if r.status_code == 500:
-            PhysicalResourceException("UE release failed. Message: %s" % r.content)
+            raise PhysicalResourceException("UE release failed. Message: %s" % r.content)
             
         pass
 
@@ -159,7 +182,7 @@ class PDManager(AbstractManager):
         logger.debug("response from UE reservation engine: %s" % r)
 
         if r.status_code == 500:
-            PhysicalResourceException("UE reservation failed. Message: %s" % r.content)
+            raise PhysicalResourceException("UE reservation failed. Message: %s" % r.content)
             
         try:
             response = r.json()
