@@ -50,6 +50,18 @@ class PDManager(AbstractManager):
             
         if resource_id == 'surrey-ue':
             # Check reachability of UE reservation engine
+            resource_data = None
+            testbed = None
+            for k, v in self._resource_data.items():
+                if v.get('resource_id') == resource_id:
+                    logger.debug("resource '%s' found!" % resource_id)
+                    resource_data = v
+                    testbed = k
+                    break
+
+            if testbed is None or resource_id is None:
+                raise PhysicalResourceException("Invalid resource %s" % resource_id)
+
             targeturl = urllib.parse.urljoin(resource_data.get("url"), "test")
             logger.info("Connecting to UE reservation engine: %s" % targeturl)
             r = requests.get(targeturl)
@@ -57,17 +69,17 @@ class PDManager(AbstractManager):
 
             if r.status_code == 500:
                 raise PhysicalResourceException("Cannot reach UE reservation engine. Message: %s" % r.content)
-                
-            status = 'down'                
+
+            status = 'down'
             try:
                 response = r.json()
                 status = response.get("status")
             except ValueError as e:
                 logger.error("Error connecting to UE reservation engine: %s" % e)
                 raise PhysicalResourceException("Cannot reach UE reservation engine.")
-                
+
             if status == 'up':
-                pass        
+                pass   
         
         else:
             pass
