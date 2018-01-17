@@ -18,6 +18,7 @@ class PhysicalResourceException(Exception):
         logger.info("Calling list_resources() to load available physical resources...")
         self.list_resources()
 
+
 class PDManager(AbstractManager):
     def refresh_resources(self, user_info) -> list:
         """
@@ -40,14 +41,15 @@ class PDManager(AbstractManager):
         resource_id = request_dict.get("properties").get('resource_id')
         if resource_id not in get_available_physical_resources().keys():
             raise PhysicalResourceException(
-                "Resource id '%s' not in the valid options: %s" % (resource_id, get_available_physical_resources().keys()))
+                "Resource id '%s' not in the valid options: %s" % (
+                    resource_id, get_available_physical_resources().keys()))
         try:
             resource_name = request_dict.get("properties").get('resource_name')
         except ValueError as e:
             raise PhysicalResourceException(
                 "Resource name not specified."
             )
-            
+
         if resource_id == 'surrey-ue':
             # Check reachability of UE reservation engine
             resource_data = None
@@ -79,8 +81,8 @@ class PDManager(AbstractManager):
                 raise PhysicalResourceException("Cannot reach UE reservation engine.")
 
             if status == 'up':
-                pass   
-        
+                pass
+
         else:
             pass
 
@@ -91,38 +93,40 @@ class PDManager(AbstractManager):
         :param payload: 
         :return:
         """
-        user_name = user_info.name
-        logger.info("Terminating UE reservation(s) of user: %s" % user_name)
         try:
-            res_dict = json.loads(payload)
-        except ValueError as e:
-            logger.error("Error parsing json resources: %s" % e)
-            return
-            
-        if res_dict:
-            resource_id = res_dict.get("properties").get("resource_id")
-            resource_name = res_dict.get("properties").get("resource_name")
-            logger.debug("resource id: %s" % resource_id)
-            resource_data = None
-            testbed = None
-            for k, v in self._resource_data.items():
-                if v.get('resource_id') == resource_id:
-                    resource_data = v
-                    testbed = k
-            if testbed is None or resource_id is None or resource_name is None:
-                logger.warn("Resource not found, probaly never deployed. I will return.")
+            user_name = user_info.name
+            logger.info("Terminating UE reservation(s) of user: %s" % user_name)
+            try:
+                res_dict = json.loads(payload)
+            except ValueError as e:
+                logger.error("Error parsing json resources: %s" % e)
                 return
-            targeturl = urllib.parse.urljoin(resource_data.get("url"), "ue/terminate")
-            logger.info("Connecting to UE reservation engine: %s" % targeturl)
-            r = requests.delete(targeturl, headers={"Authorization": "Bearer " + resource_data.get("secret"),
-                                                    "Content-Type" : "application/json"},
-                                           json={"username": user_name, "resourceId": resource_name})
-            logger.debug("response from UE reservation engine: %s" % r)
 
-        if r.status_code == 500:
-            raise PhysicalResourceException("UE release failed. Message: %s" % r.content)
-            
-        pass
+            if res_dict:
+                resource_id = res_dict.get("properties").get("resource_id")
+                resource_name = res_dict.get("properties").get("resource_name")
+                logger.debug("resource id: %s" % resource_id)
+                resource_data = None
+                testbed = None
+                for k, v in self._resource_data.items():
+                    if v.get('resource_id') == resource_id:
+                        resource_data = v
+                        testbed = k
+                if testbed is None or resource_id is None or resource_name is None:
+                    logger.warn("Resource not found, probaly never deployed. I will return.")
+                    return
+                targeturl = urllib.parse.urljoin(resource_data.get("url"), "ue/terminate")
+                logger.info("Connecting to UE reservation engine: %s" % targeturl)
+                r = requests.delete(targeturl, headers={"Authorization": "Bearer " + resource_data.get("secret"),
+                                                        "Content-Type": "application/json"},
+                                    json={"username": user_name, "resourceId": resource_name})
+                logger.debug("response from UE reservation engine: %s" % r)
+
+            if r.status_code == 500:
+                raise PhysicalResourceException("UE release failed. Message: %s" % r.content)
+
+        except:
+            logger.error("Error while releasing resource: %s. ignoring..." % payload)
 
     def create_user(self, user_info):
         pass
@@ -149,10 +153,10 @@ class PDManager(AbstractManager):
             logger.debug("resource_id: %s, testbed_id: %s" % (resource_id, testbed_id))
             if testbed_id is not None:
                 result.append(messages_pb2.ResourceMetadata(resource_id=resource_id,
-                                                        description=description,
-                                                        cardinality=cardinality,
-                                                        node_type=node_type,
-                                                        testbed=testbed_id))
+                                                            description=description,
+                                                            cardinality=cardinality,
+                                                            node_type=node_type,
+                                                            testbed=testbed_id))
                 if k == 'surrey-ue':
                     private = v.get('private')
                     self._resource_data[testbed] = dict(url=private.get('url'), secret=private.get('secret'),
@@ -188,20 +192,20 @@ class PDManager(AbstractManager):
 
         targeturl = urllib.parse.urljoin(resource_data.get("url"), "ue/reserve")
         logger.info("Connecting to UE reservation engine: %s" % targeturl)
-        r = requests.post(targeturl, json={"username": user_name, "resourceId": resource_name}, 
-                                     headers={"Authorization": "Bearer " + resource_data.get("secret"),
-                                              "Content-Type": "application/json"})
+        r = requests.post(targeturl, json={"username": user_name, "resourceId": resource_name},
+                          headers={"Authorization": "Bearer " + resource_data.get("secret"),
+                                   "Content-Type": "application/json"})
         logger.debug("response from UE reservation engine: %s" % r)
 
         if r.status_code == 500:
             raise PhysicalResourceException("UE reservation failed. Message: %s" % r.content)
-            
+
         try:
             response = r.json()
             url = response.get("url")
             email = response.get("email")
             password = response.get("password")
-            ue_name = response.get("ue_name")  
+            ue_name = response.get("ue_name")
         except ValueError as e:
             logger.error("Error reading response json from UE reservation engine: %s" % e)
             raise PhysicalResourceException("Cannot reserve UE resource")
@@ -216,8 +220,8 @@ class PDManager(AbstractManager):
                     "login": email,
                     "password": password,
                     "ue_name": ue_name
-                } 
+                }
             }
         ))
-        
+
         return result
