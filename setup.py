@@ -26,6 +26,7 @@ setup(
     scripts=["physical-device-manager"],
     install_requires=[
         'softfire-sdk==1.1.4',
+        'requests',
         'PyYAML'
     ],
     long_description=read('README.rst'),
