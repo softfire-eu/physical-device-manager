@@ -15,8 +15,6 @@ logger = get_logger(__name__)
 class PhysicalResourceException(Exception):
     def __init__(self, message):
         self.message = message
-        logger.info("Calling list_resources() to load available physical resources...")
-        self.list_resources()
 
 
 class PDManager(AbstractManager):
