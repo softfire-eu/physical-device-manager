@@ -98,7 +98,7 @@ class PDManager(AbstractManager):
             logger.error("Error parsing json resources: %s" % e)
             return
         
-        if res_dict:
+        if res_dict and res_dict.get('properties'):
             resource_id = res_dict.get("properties").get("resource_id")
             resource_name = res_dict.get("properties").get("resource_name")
             logger.debug("resource id: %s" % resource_id)
