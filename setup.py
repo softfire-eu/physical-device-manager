@@ -15,7 +15,7 @@ def read(fname):
 
 setup(
     name="physical-device-manager",
-    version="1.0.4",
+    version="1.0.5",
     author="SoftFIRE",
     author_email="softfire@softfire.eu",
     description="The SoftFIRE Physical Device Manager",
