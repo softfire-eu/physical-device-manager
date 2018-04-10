@@ -122,11 +122,11 @@ class PDManager(AbstractManager):
                                     json={"username": user_name, "resourceId": resource_name})
                 logger.debug("response from UE reservation engine: %s" % r)
 
-                    if r.status_code == 500:
-                        raise PhysicalResourceException("UE release failed. Message: %s" % r.content)
+                if r.status_code == 500:
+                    raise PhysicalResourceException("UE release failed. Message: %s" % r.content)
 
-                except:
-                    logger.error("Error while releasing resource: %s. ignoring..." % payload)
+                #except:
+                #    logger.error("Error while releasing resource: %s. ignoring..." % payload)
             
             elif resource_id == "fokus-cell":
                 pass
